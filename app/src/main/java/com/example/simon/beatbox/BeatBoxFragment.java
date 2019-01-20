@@ -54,6 +54,7 @@ public class BeatBoxFragment extends Fragment {
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 float speed = (float) (progress + 50) / 100;
                 int percentage = (int) (speed * 100);
+
                 String text = getString(R.string.playback_speed, percentage);
                 mBeatBox.setPlaybackSpeed(speed);
 
