@@ -9,6 +9,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.SeekBar;
 
 import com.example.simon.beatbox.databinding.FragmentBeatBoxBinding;
 import com.example.simon.beatbox.databinding.ListItemSoundBinding;
@@ -27,6 +28,10 @@ public class BeatBoxFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
+        //Helps to keep instance across configuration change (like rotation)
+        // it's used for non stashable objects/classes
+        setRetainInstance(true);
+
         mBeatBox = new BeatBox(getActivity());
 
     }
@@ -35,14 +40,48 @@ public class BeatBoxFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        FragmentBeatBoxBinding binding = DataBindingUtil.
+        final FragmentBeatBoxBinding binding = DataBindingUtil.
                 inflate(inflater, R.layout.fragment_beat_box, container, false);
 
         binding.recyclerView.setLayoutManager(new GridLayoutManager(getActivity(), 3));
         binding.recyclerView.setAdapter(new SoundAdapter(mBeatBox.getSounds()));
 
+        binding.seekBar.setProgress(50);
+        binding.playbackSpeedLabel.setText(getString(R.string.playback_speed, 100));
+
+        binding.seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                float speed = (float) (progress + 50) / 100;
+                int percentage = (int) (speed * 100);
+                String text = getString(R.string.playback_speed, percentage);
+                mBeatBox.setPlaybackSpeed(speed);
+
+                binding.playbackSpeedLabel.setText(text);
+
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+
         return binding.getRoot();
     }
+
+    @Override
+    public void onDestroy() {
+
+        super.onDestroy();
+        mBeatBox.release();
+    }
+
 
     private class SoundHolder extends RecyclerView.ViewHolder {
         private ListItemSoundBinding mBinding;

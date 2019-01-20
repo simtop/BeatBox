@@ -27,4 +27,7 @@ public class SoundViewModel extends BaseObservable {
 
     }
 
+    public void onButtonClicked() {
+        mBeatBox.play(mSound);
+    }
 }
